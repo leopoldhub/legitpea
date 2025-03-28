@@ -1,0 +1,19 @@
+{
+  "name": "legitpea",
+  "version": "1.0.0",
+  "description": "A Playwright application that caches the `photopea` website for offline use",
+  "main": "index.js",
+  "scripts": {
+    "start": "node ."
+  },
+  "keywords": [],
+  "author": "leopoldhub",
+  "license": "ISC",
+  "type": "module",
+  "devDependencies": {
+    "@types/node": "^22.13.14"
+  },
+  "dependencies": {
+    "playwright": "^1.51.1"
+  }
+}
