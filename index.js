@@ -87,8 +87,20 @@ async function onPageLoad(page) {
 
   if (!fs.existsSync(path.join(CACHE_DIR, "vecpea.com/rsrc/fonts/fs/")) && !fs.existsSync(path.join(CACHE_OVERWRITE_DIR, "vecpea.com/rsrc/fonts/fs/"))) {
     console.log("==== Downloading fonts ====");
-    await page.addInitScript((fonts) => {
+    await page.addInitScript(({fonts, langs}) => {
+      let langsFetchIndex = 0;
       let fontsFetchIndex = 0;
+
+      async function ln() {
+        try {
+          await fetch(langs[langsFetchIndex++]);
+        } catch (_) {
+          console.error(_);
+        }
+        if (langsFetchIndex < langs.length) {
+          setTimeout(ln, 0);
+        }
+      }
 
       async function ff() {
         try {
@@ -101,8 +113,13 @@ async function onPageLoad(page) {
         }
       }
 
+      ln();
+
       ff();
-    }, JSON.parse(fs.readFileSync("./fonts.json", "utf8")));
+    }, {
+      fonts: JSON.parse(fs.readFileSync("./fonts.json", "utf8")),
+      langs: JSON.parse(fs.readFileSync("./langs.json", "utf8"))
+    });
   }
 
   await page.addInitScript(() => {
@@ -126,6 +143,6 @@ async function onPageLoad(page) {
     process.exit(0);
   });
 
-  console.log("==== Page loaded and fonts downloaded! ====");
+  console.log("==== Page, fonts and langs downloaded! ====");
 
 })();
