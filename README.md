@@ -3,6 +3,8 @@
 ⚠️⚠️ This app does **NOT** redistribute **ANY** content from the original [photopea](https://www.photopea.com/) website,
 and is **NOT IN ANY WAY** affiliated with them. ⚠️⚠️
 
+**Also, please consider supporting the [photopea](https://www.photopea.com/) team by buying to their premium subscritpion!**
+
 ---
 
 This work by opening the original website in a virtual browser, and caching all assets for future use.
