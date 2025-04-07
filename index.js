@@ -54,10 +54,21 @@ async function onPageLoad(page) {
 
       if (fs.existsSync(getCacheOverwritePath(resourceFile)) && fs.existsSync(getCacheOverwritePath(resourceHeadersFile))) {
         console.log("r>", request.url(), "overwrite resource found!");
-        route.fulfill({
-          body: fs.readFileSync(getCacheOverwritePath(resourceFile)),
-          headers: JSON.parse(fs.readFileSync(getCacheOverwritePath(resourceHeadersFile), {encoding: "utf8"}))
-        });
+        if (!fs.existsSync(getCachePath(resourceFile)) || !fs.lstatSync(getCachePath(resourceFile)).isFile()) {
+          const res = await route.fetch();
+          if (!fs.existsSync(getCachePath(resourceFolder))) {
+            fs.mkdirSync(getCachePath(resourceFolder), {recursive: true});
+          }
+          fs.writeFileSync(getCachePath(resourceFile), await res.body(), {flag: "w"});
+          fs.writeFileSync(getCachePath(resourceHeadersFile), JSON.stringify(res.headers()), {flag: "w"});
+        }
+        const res = {
+          body: fs.readFileSync(getCacheOverwritePath(resourceFile))
+        };
+        if (fs.existsSync(getCacheOverwritePath(resourceHeadersFile)) && fs.lstatSync(getCacheOverwritePath(resourceHeadersFile)).isFile()) {
+          res.headers = JSON.parse(fs.readFileSync(getCacheOverwritePath(resourceHeadersFile), {encoding: "utf8"}));
+        }
+        await route.fulfill(res);
         return;
       }
       if (fs.existsSync(getCachePath(resourceFile)) && fs.existsSync(getCachePath(resourceHeadersFile))) {
@@ -126,7 +137,7 @@ async function onPageLoad(page) {
     localStorage.setItem("_ppp", "{\"capShown\":\"false\",\"_ltools\":\"0\"}");
   });
 
-  await page.goto("https://www.photopea.com/", {timeout: 300000});
+  await page.goto("https://www.photopea.com/", {timeout: 1000000});
 
   await onPageLoad(page);
 
@@ -134,7 +145,7 @@ async function onPageLoad(page) {
     await onPageLoad(page);
   });
 
-  await page.waitForLoadState("networkidle", {timeout: 300000});
+  await page.waitForLoadState("networkidle", {timeout: 1000000});
 
   page.on("close", async () => {
     console.log("App window closed. Shutting down...");
